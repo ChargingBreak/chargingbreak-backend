@@ -26,8 +26,7 @@ class CreateChargersTable extends Migration
             $table->string('address_country')->nullable();
             $table->string('address_region_id')->nullable();
             $table->string('address_region')->nullable();
-            $table->decimal('latitude', 10, 8)->nullable();
-            $table->decimal('longitude', 11, 9)->nullable();
+            $table->point('coordinate');
             $table->date('date_opened')->nullable();
             $table->integer('stall_count')->nullable();
             $table->boolean('counted')->nullable();
@@ -37,6 +36,8 @@ class CreateChargersTable extends Migration
             $table->boolean('battery')->nullable();
             $table->integer('status_days')->nullable();
             $table->timestamps();
+
+            $table->spatialIndex('coordinate');
         });
     }
 

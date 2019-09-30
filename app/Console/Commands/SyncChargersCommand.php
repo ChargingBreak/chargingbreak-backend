@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 use App\Charger;
 
 class SyncChargersCommand extends Command
@@ -59,8 +60,7 @@ class SyncChargersCommand extends Command
             $charger->address_country = $entry['address']['country'] ?? null;
             $charger->address_region_id = $entry['address']['regionId'] ?? null;
             $charger->address_region = $entry['address']['region'] ?? null;
-            $charger->latitude = $entry['gps']['latitude'] ?? null;
-            $charger->longitude = $entry['gps']['longitude'] ?? null;
+            $charger->coordinate = new Point($entry['gps']['latitude'] ?? 0, $entry['gps']['longitude'] ?? 0);
             $charger->date_opened = $entry['dateOpened'] ?? null;
             $charger->stall_count = $entry['stallCount'] ?? null;
             $charger->counted = $entry['counted'] ?? null;
