@@ -8,10 +8,5 @@ environments:
         build:
             - 'composer install --no-dev --classmap-authoritative'
             - 'php artisan event:cache'
-    staging:
-        memory: 1024
-        cli-memory: 512
-        domain: api-staging.chargingbreak.com
-        build:
-            - 'composer install --classmap-authoritative'
-            - 'php artisan event:cache'
+        deploy:
+            - 'php artisan migrate --force'
