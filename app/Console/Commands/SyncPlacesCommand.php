@@ -140,7 +140,7 @@ class SyncPlacesCommand extends Command
         $hours = $properties['opening_hours'] ?? null;
 
         if (is_array($hours)) {
-            $hours = implode(', ', $hours);
+            $hours = implode('; ', $hours);
         }
 
         $place = Place::firstOrNew(['place_id' => $feature->getId()]);
