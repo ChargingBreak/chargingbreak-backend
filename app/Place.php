@@ -11,4 +11,10 @@ class Place extends Model
 
     public $fillable = ['place_id'];
     public $spatialFields = ['coordinate'];
+
+    public $with = ['spider'];
+
+    public function spider() {
+        return $this->belongsTo(PlaceSpider::class);
+    }
 }

@@ -17,7 +17,7 @@ use App\Place;
 class SyncPlacesCommand extends Command
 {
     const PLACES_URL = 'https://s3.amazonaws.com/placescraper-results/runs/2019-08-16-02-28-56/output.tar.gz';
-    const MAX_CHARGER_TO_PLACE_DISTANCE_METERS = 100;
+    const MAX_CHARGER_TO_PLACE_DISTANCE_METERS = 250;
 
     /**
      * The name and signature of the console command.
@@ -97,7 +97,8 @@ class SyncPlacesCommand extends Command
         }
     }
 
-    private function processPlaceFile(string $filename) {
+    private function processPlaceFile(string $filename)
+    {
         $this->info($filename);
 
         $json = @json_decode(file_get_contents($filename));
@@ -124,7 +125,8 @@ class SyncPlacesCommand extends Command
         }
     }
 
-    private function storePlace(Feature $feature, Point $placePoint, Charger $charger) {
+    private function storePlace(Feature $feature, Point $placePoint, Charger $charger)
+    {
         $properties = $feature->getProperties();
 
         $spider = PlaceSpider::where('name', $properties['@spider'])->first();
@@ -135,9 +137,16 @@ class SyncPlacesCommand extends Command
             $spider->save();
         }
 
+        $hours = $properties['opening_hours'] ?? null;
+
+        if (is_array($hours)) {
+            $hours = implode(', ', $hours);
+        }
+
         $place = Place::firstOrNew(['place_id' => $feature->getId()]);
         $place->spider_id = $spider->id;
         $place->charger_id = $charger->id;
+        $place->distance_meters = intval($this->calculateDistance($placePoint, $charger->coordinate));
         $place->name = $properties['name'] ?? null;
         $place->address_full = $properties['addr:full'] ?? null;
         $place->address_housenumber = $properties['addr:housenumber'] ?? null;
@@ -149,7 +158,24 @@ class SyncPlacesCommand extends Command
         $place->coordinate = $placePoint;
         $place->phone = $properties['phone'] ?? null;
         $place->website = $properties['website'] ?? null;
-        $place->opening_hours = $properties['opening_hours'] ?? null;
+        $place->opening_hours = $hours;
         $place->save();
+    }
+
+    private function calculateDistance(Point $pointA, Point $pointB)
+    {
+        $earthRadius = 6378137.0;
+
+        $latFrom = deg2rad($pointA->getLat());
+        $lonFrom = deg2rad($pointA->getLng());
+        $latTo = deg2rad($pointB->getLat());
+        $lonTo = deg2rad($pointB->getLng());
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+        cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+        return $angle * $earthRadius;
     }
 }

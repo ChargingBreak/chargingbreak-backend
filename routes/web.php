@@ -12,3 +12,4 @@
 */
 
 Route::get('chargers', 'ChargersController');
+Route::get('chargers/{name}', 'ChargerDetailsController');

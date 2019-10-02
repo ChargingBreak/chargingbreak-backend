@@ -11,4 +11,8 @@ class Charger extends Model
 
     public $fillable = ['location_id'];
     public $spatialFields = ['coordinate'];
+
+    public function places() {
+        return $this->hasMany(Place::class);
+    }
 }

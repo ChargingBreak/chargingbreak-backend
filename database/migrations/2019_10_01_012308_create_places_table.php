@@ -25,6 +25,8 @@ class CreatePlacesTable extends Migration
             $table->unsignedInteger('charger_id');
             $table->foreign('charger_id')->references('id')->on('chargers');
 
+            $table->integer('distance_meters')->index()->nullable();
+
             $table->string('address_full')->nullable();
             $table->string('address_housenumber')->nullable();
             $table->string('address_street')->nullable();
